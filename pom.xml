@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.rill</groupId>
+    <artifactId>rill-rest-client</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <properties>
+	<com.rill.request-signer.version>1.0-SNAPSHOT</com.rill.request-signer.version>
+	<com.rill.common.version>1.0-SNAPSHOT</com.rill.common.version>
+	<com.mashape.unirest.version>1.3.12</com.mashape.unirest.version>
+        <joda.time.version>2.2</joda.time.version>
+        <org.codehaus.jackson.version>1.9.2</org.codehaus.jackson.version>
+        <org.mockito.version>1.8.5</org.mockito.version>
+        <org.junit.version>4.8.1</org.junit.version>	
+	<ch.qos.logback.version>0.9.28</ch.qos.logback.version>
+    </properties>
+
+    <dependencies>
+      <!-- RESOLVE common is bad dependency (too big->unsafe, needs additional build steps to publish artifact, etc -->      
+      <!-- <dependency> -->
+      <!--   <groupId>com.rill</groupId> -->
+      <!--   <artifactId>rill-common</artifactId> -->
+      <!-- 	<version>${com.rill.common.version}</version> -->
+      <!-- </dependency> -->
+      <dependency>
+        <groupId>com.rill</groupId>
+        <artifactId>request-signer</artifactId>
+	<version>${com.rill.request-signer.version}</version>
+      </dependency>
+      <dependency>
+	<groupId>com.mashape.unirest</groupId>
+	<artifactId>unirest-java</artifactId>
+	<version>${com.mashape.unirest.version}</version>
+      </dependency>
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+            <version>${joda.time.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.codehaus.jackson</groupId>
+          <artifactId>jackson-mapper-asl</artifactId>
+          <version>${org.codehaus.jackson.version}</version>
+        </dependency>
+      <!-- <dependency> -->
+      <!--   <groupId>org.springframework</groupId> -->
+      <!--   <artifactId>spring-web</artifactId> -->
+      <!-- </dependency> -->
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>${org.junit.version}</version>
+        <scope>test</scope>
+      </dependency>      
+      <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-core</artifactId>
+	<version>${org.mockito.version}</version>
+        <scope>test</scope>
+      </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-core</artifactId>
+            <version>${ch.qos.logback.version}</version>
+            <scope>test</scope>
+        </dependency> 
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${ch.qos.logback.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+    <build>
+      <plugins>
+        <plugin>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <configuration>
+            <useFile>false</useFile>
+            <argLine>-Duser.timezone=UTC</argLine>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>2.3.2</version>
+                <configuration>
+                  <source>1.6</source>
+                  <target>1.6</target>
+                </configuration>
+        </plugin>
+      </plugins>
+    </build>
+    
+</project>
