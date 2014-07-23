@@ -12,12 +12,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.mashape.unirest.request.HttpRequestWithBody;
 
-import com.rill.rest.sign.ClassicApiRequestSigner;
 import com.rill.rest.sign.OAuthApiRequestSigner;
+import com.rill.rest.sign.EncryptionAlgorithm;
 
-import static com.rill.api.RillApiConstants.*;
-import static com.rill.api.RillAuthConstants.*;
-import static com.rill.api.OAuthConstants.*;
+import com.rill.api.RillApiParam;
+import com.rill.api.RillAuthParam;
+import com.rill.api.OAuthParam;
 
 public class OAuthClient extends BaseRillClient {
 
@@ -26,65 +26,54 @@ public class OAuthClient extends BaseRillClient {
     private String nonce;
     private String oauthVersion;
 
-    public OAuthClient(){
-	super();
-	encryptionAlgorithm = ClassicApiRequestSigner.EncryptionAlgorithm.HMAC_SHA1_ALGORITHM;
+    public OAuthClient(final String url){
+        super(url);
+        encryptionAlgorithm = EncryptionAlgorithm.HMAC_SHA1_ALGORITHM;
     }
-
+    
     public OAuthClient withNonce(final String nonce){
-	this.nonce=nonce;
-	return this;
+        this.nonce=nonce;
+        return this;
     }
     public OAuthClient withOauthVersion(final String version){
-	this.oauthVersion=version;
-	return this;
+        this.oauthVersion=version;
+        return this;
     }
 
     @Override
     protected void addAuth(final HttpRequestWithBody request, final String timestamp) {
-	final String signature = getSignature(timestamp);
-	final StringBuilder authString = new StringBuilder(OAUTH)
-	    .append(" ")
-	    .append(OAUTH_CONSUMER_KEY).append("=").append(apiKey).append(", ")
-	    .append(OAUTH_NONCE).append("=").append(nonce).append(", ")
-	    .append(OAUTH_SIGNATURE).append("=").append(signature).append(", ")
-	    .append(OAUTH_SIGNATURE_METHOD).append("=").append(encryptionAlgorithm.getName()).append(", ")
-	    .append(OAUTH_TIMESTAMP).append("=").append(timestamp);
-	if(oauthVersion!=null){
-	    authString.append(", ").append(OAUTH_VERSION).append("=").append(oauthVersion);
-	}
-	request.header(AUTHORIZATION_HEADER, authString.toString());
+        final String signature = getSignature(timestamp);
+        final StringBuilder authString = new StringBuilder(OAuthParam.OAUTH)
+            .append(" ")
+            .append(OAuthParam.OAUTH_CONSUMER_KEY).append("=").append(apiKey).append(", ")
+            .append(OAuthParam.OAUTH_NONCE).append("=").append(nonce).append(", ")
+            .append(OAuthParam.OAUTH_SIGNATURE).append("=").append(signature).append(", ")
+            .append(OAuthParam.OAUTH_SIGNATURE_METHOD).append("=").append(encryptionAlgorithm.getName()).append(", ")
+            .append(OAuthParam.OAUTH_TIMESTAMP).append("=").append(timestamp);
+        if(oauthVersion!=null){
+            authString.append(", ").append(OAuthParam.OAUTH_VERSION).append("=").append(oauthVersion);
+        }
+        request.header(OAuthParam.AUTHORIZATION_HEADER, authString.toString());
     }
 
     protected String getSignature(String timestamp){
-	OAuthApiRequestSigner.Builder signer = new OAuthApiRequestSigner.Builder()
-	    .withEncryptionAlgorithm(this.encryptionAlgorithm)
-	    .withMethod(this.method)
-	    .withUrl(this.url)
-	    .withEncryptionKey(this.secret+"&")
-	    .withParameterValue(OAUTH_CONSUMER_KEY, this.apiKey)
-	    .withParameterValue(OAUTH_NONCE, this.nonce)
-	    .withParameterValue(OAUTH_SIGNATURE_METHOD, this.encryptionAlgorithm.getName())
-	    .withParameterValue(OAUTH_TIMESTAMP, timestamp)
-	    //RESOLVE refactor- common for all authentication methods
-	    .withParameterValue(TIMESTAMP_PARAM_NAME, timestamp);
-	
-	for(String identifier : this.membershipIdentifiers){
-	    signer.withParameterValue(MEMBERSHIP_ID_PARAM_NAME, identifier);
-	}
-	for(String keyword : this.keywords){
-	    signer.withParameterValue(KEYWORD_PARAM_NAME, keyword);
-	}
-	if(this.verificationTargetAcronym!=null){
-	    signer.withParameterValue(PARTNER_ACRONYM_PARAM_NAME, this.verificationTargetAcronym);
-	}
-
-	return signer.sign();
+        OAuthApiRequestSigner.Builder signer = new OAuthApiRequestSigner.Builder()
+            .withEncryptionAlgorithm(this.encryptionAlgorithm)
+            .withMethod(this.method)
+            .withUrl(this.url)
+            .withEncryptionKey(this.secret+"&")
+            .withParameterValue(OAuthParam.OAUTH_CONSUMER_KEY.getName(), this.apiKey)
+            .withParameterValue(OAuthParam.OAUTH_NONCE.getName(), this.nonce)
+            .withParameterValue(OAuthParam.OAUTH_SIGNATURE_METHOD.getName(), this.encryptionAlgorithm.getName())
+            .withParameterValue(OAuthParam.OAUTH_TIMESTAMP.getName(), timestamp);
+        //.withParameterValue(RillAuthParam.TIMESTAMP.getName(), timestamp);
+        addCommonSignatureParams(signer);
+        return signer.sign();
     }
     
     @Override
     protected void validateExtraParameters(){
-	throwIfNotPresent(this.nonce, "Nonce", "withNonce()");
+        throwIfNotPresent(this.nonce, "Nonce", "withNonce()");
     }
 
 }

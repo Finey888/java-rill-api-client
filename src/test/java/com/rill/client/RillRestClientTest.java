@@ -19,12 +19,12 @@ public class RillRestClientTest {
     @Test
     public void testOauthClient() throws Exception {
 
-	OAuthClient client = new OAuthClient();
+	OAuthClient client = new OAuthClient("https://www.rillate.com/api/mqs/v1/query");
 	RillRestResponse rrr = client
 	    .withNonce("1234567")
 	    .withApiKey("12345")
 	    .withSecret("abcde")
-	    .withMemberIdentifier("4155316334")
+	    .withMobilePhoneNumber("4155316334")
 	    .withVerificationTargetAcronym("ANA")
 	    .verifyMembership();
 	System.out.println(rrr);
