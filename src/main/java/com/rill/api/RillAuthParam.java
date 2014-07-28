@@ -4,7 +4,7 @@ import com.rill.rest.sign.ClassicApiRequestSigner;
 
 public enum RillAuthParam {
 
-    API_KEY("apiKey"),
+    API_KEY("api-key"),
     SIGNATURE("sig"),
     SIGNATURE_METHOD(ClassicApiRequestSigner.SIGNATURE_METHOD_PARAM_NAME),
     TIMESTAMP("timestamp");
