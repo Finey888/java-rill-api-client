@@ -6,19 +6,18 @@ import java.util.List;
 
 import com.rill.api.RillRestResponse; 
 //import org.apache.commons.lang3.StringUtils;
+//import org.apache.http.client.utils.URIBuilder;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.mashape.unirest.request.HttpRequestWithBody;
+import com.mashape.unirest.request.GetRequest;
 
 import com.rill.rest.sign.ClassicApiRequestSigner;
 import com.rill.rest.sign.OAuthApiRequestSigner;
 import com.rill.rest.sign.EncryptionAlgorithm;
 
-import com.rill.api.RillApiParam;
 import com.rill.api.RillAuthParam;
-import com.rill.api.OAuthParam;
 
 public class SignatureAuthClient extends BaseRillClient {
 
@@ -30,22 +29,21 @@ public class SignatureAuthClient extends BaseRillClient {
     }
 
     @Override
-    protected void addAuth(final HttpRequestWithBody request, final String timestamp) {
+    protected void addAuth(final GetRequest request, final Long timestamp) {
         request
             .field(RillAuthParam.API_KEY.getName(), this.apiKey)
-            .field(RillAuthParam.SIGNATURE.getName(), this.encryptionAlgorithm.getName())
-            .field(RillAuthParam.TIMESTAMP.getName(), timestamp)
+            //.field(RillAuthParam.TIMESTAMP.getName(), timestamp) //parent appends
+	    .field(RillAuthParam.SIGNATURE_METHOD.getName(), encryptionAlgorithm.getName())
             .field(RillAuthParam.SIGNATURE.getName(), getSignature(timestamp));
     }
     
-    protected String getSignature(String timestamp){
+    protected String getSignature(Long timestamp){
         ClassicApiRequestSigner.Builder signer = new ClassicApiRequestSigner.Builder()
             .withEncryptionAlgorithm(this.encryptionAlgorithm)
             .withEncryptionKey(this.secret)
-            .withParameterValue(RillAuthParam.API_KEY.getName(), this.apiKey)
-            .withParameterValue(RillAuthParam.SIGNATURE.getName(), this.encryptionAlgorithm.getName())
-            .withParameterValue(RillAuthParam.TIMESTAMP.getName(), timestamp);
-        addCommonSignatureParams(signer);
+            .withParameterValue(RillAuthParam.API_KEY.getName(), this.apiKey);
+	//.withParameterValue(RillAuthParam.TIMESTAMP.getName(), timestamp); parent appends
+        addCommonSignatureParams(signer, timestamp);
         return signer.sign();
     }
     

@@ -1,21 +1,21 @@
 package com.rill.client;
 
+import java.net.URLEncoder;
 import java.util.LinkedList;
 import java.util.List;
 
-
 import com.rill.api.RillRestResponse; 
 //import org.apache.commons.lang3.StringUtils;
+import org.apache.http.client.utils.URIBuilder;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.mashape.unirest.request.HttpRequestWithBody;
+import com.mashape.unirest.request.GetRequest;
 
 import com.rill.rest.sign.OAuthApiRequestSigner;
 import com.rill.rest.sign.EncryptionAlgorithm;
 
-import com.rill.api.RillApiParam;
 import com.rill.api.RillAuthParam;
 import com.rill.api.OAuthParam;
 
@@ -41,22 +41,24 @@ public class OAuthClient extends BaseRillClient {
     }
 
     @Override
-    protected void addAuth(final HttpRequestWithBody request, final String timestamp) {
-        final String signature = getSignature(timestamp);
+    protected void addAuth(final GetRequest request, final Long timestamp) {
+	final Long timestampSeconds = timestamp/1000L;
+        final String signature = getSignature(timestampSeconds, timestamp);
         final StringBuilder authString = new StringBuilder(OAuthParam.OAUTH)
             .append(" ")
-            .append(OAuthParam.OAUTH_CONSUMER_KEY).append("=").append(apiKey).append(", ")
-            .append(OAuthParam.OAUTH_NONCE).append("=").append(nonce).append(", ")
-            .append(OAuthParam.OAUTH_SIGNATURE).append("=").append(signature).append(", ")
-            .append(OAuthParam.OAUTH_SIGNATURE_METHOD).append("=").append(encryptionAlgorithm.getName()).append(", ")
-            .append(OAuthParam.OAUTH_TIMESTAMP).append("=").append(timestamp);
+            .append(URLEncoder.encode(OAuthParam.OAUTH_CONSUMER_KEY.getName())).append("=").append(URLEncoder.encode(apiKey)).append(", ")
+            .append(URLEncoder.encode(OAuthParam.OAUTH_NONCE.getName())).append("=").append(URLEncoder.encode(nonce)).append(", ")
+            .append(URLEncoder.encode(OAuthParam.OAUTH_SIGNATURE.getName())).append("=").append(URLEncoder.encode(signature)).append(", ")
+            .append(URLEncoder.encode(OAuthParam.OAUTH_SIGNATURE_METHOD.getName())).append("=").append(URLEncoder.encode(encryptionAlgorithm.getName())).append(", ")
+            .append(URLEncoder.encode(OAuthParam.OAUTH_TIMESTAMP.getName())).append("=").append(String.valueOf(timestampSeconds));
         if(oauthVersion!=null){
-            authString.append(", ").append(OAuthParam.OAUTH_VERSION).append("=").append(oauthVersion);
+            authString.append(", ").append(URLEncoder.encode(OAuthParam.OAUTH_VERSION.getName())).append("=").append(URLEncoder.encode(oauthVersion));
         }
+
         request.header(OAuthParam.AUTHORIZATION_HEADER, authString.toString());
     }
 
-    protected String getSignature(String timestamp){
+    protected String getSignature(Long timestampSeconds, Long timestamp){
         OAuthApiRequestSigner.Builder signer = new OAuthApiRequestSigner.Builder()
             .withEncryptionAlgorithm(this.encryptionAlgorithm)
             .withMethod(this.method)
@@ -65,9 +67,8 @@ public class OAuthClient extends BaseRillClient {
             .withParameterValue(OAuthParam.OAUTH_CONSUMER_KEY.getName(), this.apiKey)
             .withParameterValue(OAuthParam.OAUTH_NONCE.getName(), this.nonce)
             .withParameterValue(OAuthParam.OAUTH_SIGNATURE_METHOD.getName(), this.encryptionAlgorithm.getName())
-            .withParameterValue(OAuthParam.OAUTH_TIMESTAMP.getName(), timestamp);
-        //.withParameterValue(RillAuthParam.TIMESTAMP.getName(), timestamp);
-        addCommonSignatureParams(signer);
+            .withParameterValue(OAuthParam.OAUTH_TIMESTAMP.getName(), String.valueOf(timestampSeconds));
+        addCommonSignatureParams(signer, timestamp);
         return signer.sign();
     }
     

@@ -10,8 +10,10 @@ import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.codehaus.jackson.map.ObjectMapper;
+//import org.apache.http.client.utils.URIBuilder;
 
-import com.mashape.unirest.request.HttpRequestWithBody;
+//import com.mashape.unirest.request.HttpRequestWithBody;
+import com.mashape.unirest.request.GetRequest;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.JsonNode;
@@ -23,7 +25,6 @@ import com.rill.rest.sign.SignatureBuilder;
 
 import com.rill.api.RillApiParam;
 import com.rill.api.RillAuthParam;
-import com.rill.api.OAuthParam;
 
 public abstract class BaseRillClient {
 
@@ -31,7 +32,7 @@ public abstract class BaseRillClient {
     
     protected EncryptionAlgorithm encryptionAlgorithm = EncryptionAlgorithm.HMAC_SHA256_ALGORITHM;
     protected String url = "https://www.rillate.com/api/mqs/v1/query";
-    protected String method = "POST";
+    protected String method = "GET";
     protected String apiKey;
     protected String secret;
     protected String mobile;
@@ -42,9 +43,11 @@ public abstract class BaseRillClient {
     protected String dateOfBirth;
     protected Map<String, String> keywords = new HashMap();
     protected String verificationTargetAcronym;
+    //protected URIBuilder uriBuilder = new URIBuilder();
 
     BaseRillClient(final String url){
         this.url=url;
+	//this.uriBuilder = new URIBuilder(url);
     }
     public BaseRillClient withApiKey(final String apiKey){
         this.apiKey=apiKey;
@@ -88,50 +91,76 @@ public abstract class BaseRillClient {
         this.keywords.put(attribute, keyword);
         return this;
     }
+
     public BaseRillClient withVerificationTargetAcronym(final String acronym){
         this.verificationTargetAcronym=acronym;
         return this;
     }
-    public RillRestResponse verifyMembership() throws Exception {
-	
+
+    GetRequest getHttpRequest(){
         validate();
-
-        final String timestamp = String.valueOf(new DateTime().getMillis());
-        HttpRequestWithBody request = Unirest.post(url);
-
+	
+        final Long timestamp = new DateTime().getMillis();
+	GetRequest request = Unirest.get(url);
         addAuth(request, timestamp);
         
         if(this.mobile!=null){
+	    log.debug("setting {} to {}", RillApiParam.MOBILE_NUMBER.getName(), this.mobile);
             request.field(RillApiParam.MOBILE_NUMBER.getName(), this.mobile);
+	    //uriBuilder.addParameter(RillApiParam.MOBILE_NUMBER.getName(), this.mobile);
         }
 
         if(this.landline!=null){
+	    log.debug("setting {} to {}", RillApiParam.PHONE_NUMBER.getName(), this.landline);
             request.field(RillApiParam.PHONE_NUMBER.getName(), this.landline);
+            //uriBuilder.addParameter(RillApiParam.PHONE_NUMBER.getName(), this.landline);
         }
 
         if(this.email!=null){
+	    log.debug("setting {} to {}", RillApiParam.EMAIL.getName(), this.email);
             request.field(RillApiParam.EMAIL.getName(), this.email);
+	    //uriBuilder.addParameter(RillApiParam.EMAIL.getName(), this.email);
         }
 
         if(this.firstName!=null){
+	    log.debug("setting {} to {}", RillApiParam.FIRST_NAME.getName(), this.firstName);
             request.field(RillApiParam.FIRST_NAME.getName(), this.firstName);
+	    //uriBuilder.addParameter(RillApiParam.FIRST_NAME.getName(), this.firstName);
         }
 
         if(this.lastName!=null){
+	    log.debug("setting {} to {}", RillApiParam.LAST_NAME.getName(), this.lastName);
             request.field(RillApiParam.LAST_NAME.getName(), this.lastName);
+	    //uriBuilder.addParameter(RillApiParam.LAST_NAME.getName(), this.lastName);
         }
 
         if(this.dateOfBirth!=null){
+	    log.debug("setting {} to {}", RillApiParam.DOB.getName(), this.dateOfBirth);
             request.field(RillApiParam.DOB.getName(), this.dateOfBirth);
+	    //uriBuilder.addParameter(RillApiParam.DOB.getName(), this.dateOfBirth);
         }
 
         for(String keyword : this.keywords.keySet()){
+	    log.debug("setting {} to {}", keyword, this.keywords.get(keyword));
             request.field(keyword, this.keywords.get(keyword));
+	    //uriBuilder.addParameter(keyword, this.keywords.get(keyword));
         }
         if(this.verificationTargetAcronym!=null){
+	    log.debug("setting {} to {}", RillApiParam.PARTNER_ACRONYM.getName(), this.verificationTargetAcronym);
             request.field(RillApiParam.PARTNER_ACRONYM.getName(), this.verificationTargetAcronym);
+	    //uriBuilder.addParameter(RillApiParam.PARTNER_ACRONYM.getName(), this.verificationTargetAcronym);
         }
+	log.debug("setting {} to {}", RillAuthParam.TIMESTAMP.getName(), timestamp);
         request.field(RillAuthParam.TIMESTAMP.getName(), timestamp);
+	//uriBuilder.addParameter(RillAuthParam.TIMESTAMP.getName(), timestamp);
+        //HttpRequest request = Unirest.get(uriBuilder.build().toString());
+
+	return request;
+    }
+
+    public RillRestResponse verifyMembership() throws Exception {
+	//HttpRequestWithBody request = getHttpRequest();
+	GetRequest request = getHttpRequest();
         HttpResponse<JsonNode> jsonResponse = request.asJson();
         log.debug("response json "+jsonResponse.getBody());
         return new ObjectMapper().readValue(jsonResponse.getBody().getObject().toString(), RillRestResponse.class);
@@ -163,7 +192,7 @@ public abstract class BaseRillClient {
         }
     }
 
-    protected void addCommonSignatureParams(SignatureBuilder signer){
+    protected void addCommonSignatureParams(SignatureBuilder signer, Long timestamp){
                     
         if(this.mobile!=null){
             signer.withParameterValue(RillApiParam.MOBILE_NUMBER.getName(), this.mobile);
@@ -195,7 +224,11 @@ public abstract class BaseRillClient {
         if(this.verificationTargetAcronym!=null){
             signer.withParameterValue(RillApiParam.PARTNER_ACRONYM.getName(), this.verificationTargetAcronym);
         }
+
+	signer.withParameterValue(RillAuthParam.TIMESTAMP.getName(), String.valueOf(timestamp));
+
     }
-    protected abstract void addAuth(HttpRequestWithBody request, String timestamp);
+    //protected abstract void addAuth(HttpRequestWithBody request, String timestamp);
+    protected abstract void addAuth(GetRequest request, Long timestamp);
     protected abstract void validateExtraParameters();
 }

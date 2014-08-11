@@ -20,4 +20,8 @@ public enum RillApiParam {
     public String getName(){
         return name;
     }
+    
+    public String getCommandLineSafeName(){
+	return name.replace("-", "");
+    }
 }
