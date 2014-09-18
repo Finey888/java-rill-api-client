@@ -6,7 +6,7 @@ public class RillRestResponse {
 
     private Response.Status status;
     private String url;
-    private Object dataPayload;
+    private DataPayload dataPayload;
     private String message;
 
     public RillRestResponse(){
@@ -32,7 +32,7 @@ public class RillRestResponse {
         return this.url;
     }
 
-    public Object getDataPayload(){
+    public DataPayload getDataPayload(){
         return dataPayload;
     }
     
@@ -45,7 +45,7 @@ public class RillRestResponse {
         return this;
     }
     
-    public RillRestResponse withSuccess(Object data) {
+    public RillRestResponse withSuccess(DataPayload data) {
         this.status = Response.Status.OK;
         this.dataPayload = data;
         this.message="OK";
