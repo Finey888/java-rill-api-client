@@ -3,8 +3,8 @@ package com.rill.api;
 public class DataPayload {
 
     public static enum Answer {
-        YES,
-        NO,
+        TRUE,
+        FALSE,
         UNKNOWN;
     }
 
