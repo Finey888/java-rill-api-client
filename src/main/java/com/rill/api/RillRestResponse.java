@@ -1,12 +1,12 @@
-package com.rill.api;
+ package com.rill.api;
 
 import javax.ws.rs.core.Response;
 
-public class RillRestResponse {
+public class RillRestResponse<T> {
 
     private Response.Status status;
     private String url;
-    private DataPayload dataPayload;
+    private T dataPayload;
     private String message;
 
     public RillRestResponse(){
@@ -32,7 +32,7 @@ public class RillRestResponse {
         return this.url;
     }
 
-    public DataPayload getDataPayload(){
+    public T getDataPayload(){
         return dataPayload;
     }
     
@@ -45,7 +45,7 @@ public class RillRestResponse {
         return this;
     }
     
-    public RillRestResponse withSuccess(DataPayload data) {
+    public RillRestResponse withSuccess(T data) {
         this.status = Response.Status.OK;
         this.dataPayload = data;
         this.message="OK";

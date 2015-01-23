@@ -1,6 +1,6 @@
 package com.rill.api;
 
-public class DataPayload {
+public class MembershipQueryDataPayload {
 
     public static enum Answer {
         TRUE,
