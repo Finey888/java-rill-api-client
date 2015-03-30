@@ -10,68 +10,66 @@ import java.util.List;
 
 
 //@ApiModel(description = "")
-public class ReferenceCheck implements ReferenceCheckPayload { 
-  /**
-   **/
-  private Long id = null;
-  /**
-   **/
-  private Long candidateId = null;
-  /**
-   **/
-  private Long employerId = null;
-  /**
-   **/
-  private List<Referral> references = new ArrayList<Referral>() ;
+public class ReferenceCheck implements ReferenceCheckPayload, ReferenceCheckRequest { 
+    /**
+     **/
+    private Long id = null;
+
+    private Candidate candidate;
+    /**
+     **/
+    private Employer employer = null;
+    /**
+     **/
+    private List<Referral> references = new ArrayList<Referral>() ;
   
   
     //@ApiModelProperty(required = false, value = "")
-  public Long getId() {
-    return id;
-  }
-  public void setId(Long id) {
-    this.id = id;
-  }
+    public Long getId() {
+        return id;
+    }
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    //@ApiModelProperty(required = true, value = "")
+    public Candidate getCandidate() {
+        return candidate;
+    }
+    public void setCandidate(Candidate candidate) {
+        this.candidate = candidate;
+    }
 
   
     //@ApiModelProperty(required = true, value = "")
-  public Long getCandidateId() {
-    return candidateId;
-  }
-  public void setCandidateId(Long candidateId) {
-    this.candidateId = candidateId;
-  }
+    public Employer getEmployer() {
+        return employer;
+    }
+    public void setEmployer(Employer employer) {
+        this.employer = employer;
+    }
 
   
     //@ApiModelProperty(required = true, value = "")
-  public Long getEmployerId() {
-    return employerId;
-  }
-  public void setEmployerId(Long employerId) {
-    this.employerId = employerId;
-  }
-
-  
-    //@ApiModelProperty(required = true, value = "")
-  public List<Referral> getReferences() {
-    return references;
-  }
-  public void setReferences(List<Referral> references) {
-    this.references = references;
-  }
+    public List<Referral> getReferences() {
+        return references;
+    }
+    public void setReferences(List<Referral> references) {
+        this.references = references;
+    }
 
   
 
-  @Override
-  public String toString()  {
-    StringBuilder sb = new StringBuilder();
-    sb.append("class ReferenceCheck {\n");
+    @Override
+    public String toString()  {
+        StringBuilder sb = new StringBuilder();
+        sb.append("class ReferenceCheck {\n");
     
-    sb.append("  id: ").append(id).append("\n");
-    sb.append("  candidateId: ").append(candidateId).append("\n");
-    sb.append("  employerId: ").append(employerId).append("\n");
-    sb.append("  references: ").append(references).append("\n");
-    sb.append("}\n");
-    return sb.toString();
-  }
+        sb.append("  id: ").append(id).append("\n");
+        sb.append("  candidate: ").append(candidate).append("\n");
+        sb.append("  employer: ").append(employer).append("\n");
+        sb.append("  references: ").append(references).append("\n");
+        sb.append("}\n");
+        return sb.toString();
+    }
 }

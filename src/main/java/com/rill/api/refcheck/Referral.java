@@ -8,21 +8,16 @@ import java.util.Date;
 
 //@ApiModel(description = "")
 public class Referral  { 
+
+  public static enum RelationshipTypeEnum { peer, manager, client };
+
   /**
    **/
   private String referenceEmail = null;
   /**
    **/
   private RelationshipTypeEnum relationshipType = null;
-  
-  public enum RelationshipTypeEnum { peer, manager, client };
-  
-  /**
-   **/
-  private StatusEnum status = null;
-  
-  public enum StatusEnum { pending, noresponse, inprogress, complete };
-  
+    
   /**
    **/
   private Date lastUpdated = null;
@@ -45,16 +40,6 @@ public class Referral  {
     this.relationshipType = relationshipType;
   }
 
-  
-    //@ApiModelProperty(required = false, value = "")
-  public StatusEnum getStatus() {
-    return status;
-  }
-  public void setStatus(StatusEnum status) {
-    this.status = status;
-  }
-
-  
     //@ApiModelProperty(required = false, value = "")
   public Date getLastUpdated() {
     return lastUpdated;
@@ -72,7 +57,7 @@ public class Referral  {
     
     sb.append("  referenceEmail: ").append(referenceEmail).append("\n");
     sb.append("  relationshipType: ").append(relationshipType).append("\n");
-    sb.append("  status: ").append(status).append("\n");
+    //sb.append("  status: ").append(status).append("\n");
     sb.append("  lastUpdated: ").append(lastUpdated).append("\n");
     sb.append("}\n");
     return sb.toString();

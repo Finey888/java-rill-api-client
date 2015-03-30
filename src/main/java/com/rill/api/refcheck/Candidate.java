@@ -10,6 +10,8 @@ public class Candidate implements ReferenceCheckPayload {
   /**
    **/
   private Long id = null;
+
+  //private String externalId = null;
   /**
    **/
   private String email = null;
@@ -31,6 +33,13 @@ public class Candidate implements ReferenceCheckPayload {
   public void setId(Long id) {
     this.id = id;
   }
+
+    //public String getExternalId() {
+    //return externalId;
+    //}
+    //public void setExternalId(String id) {
+    //this.externalId = id;
+    //}
 
   
     //@ApiModelProperty(required = true, value = "")

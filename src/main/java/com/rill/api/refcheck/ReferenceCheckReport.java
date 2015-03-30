@@ -3,7 +3,9 @@ package com.rill.api.refcheck;
 import com.rill.api.ReferenceCheckPayload;
 
 import java.util.ArrayList;
+//import java.util.HashMap;
 import java.util.List;
+//import java.util.Map;
 
 //import com.rill.common.refcheck.Addendum;
 //import com.rill.common.refcheck.EducationRecord;
@@ -16,14 +18,17 @@ import java.util.List;
 
 //@ApiModel(description = "")
 public class ReferenceCheckReport implements ReferenceCheckPayload { 
+
+  public static enum StatusEnum { complete, inprogress, unknown, expired };
+
   /**
    **/
-  private Long referenceCheckId = null;
+  private ReferenceCheck referenceCheck;
   /**
    **/
   private StatusEnum status = null;
   
-  public enum StatusEnum { complete, inprogress, unknown };
+  //private Map<Long, Referral.StatusEnum> referralStatusMap;
   
   /**
    **/
@@ -42,25 +47,25 @@ public class ReferenceCheckReport implements ReferenceCheckPayload {
   private List<Addendum> addenda = new ArrayList<Addendum>() ;
   
   
-    //@ApiModelProperty(required = true, value = "")
-  public Long getReferenceCheckId() {
-    return referenceCheckId;
+  //@ApiModelProperty(required = true, value = "")
+  public ReferenceCheck getReferenceCheck() {
+    return referenceCheck;
   }
-  public void setReferenceCheckId(Long referenceCheckId) {
-    this.referenceCheckId = referenceCheckId;
+  public void setReferenceCheck(ReferenceCheck referenceCheck) {
+    this.referenceCheck = referenceCheck;
   }
 
   
-    //@ApiModelProperty(required = true, value = "")
+  //@ApiModelProperty(required = true, value = "")
   public StatusEnum getStatus() {
-    return status;
-  }
-  public void setStatus(StatusEnum status) {
-    this.status = status;
+      return status;
   }
 
+  public void setStatus(StatusEnum status){
+      this.status = status;
+  }
   
-    //@ApiModelProperty(required = false, value = "")
+  //@ApiModelProperty(required = false, value = "")
   public List<EducationRecord> getEducationChecks() {
     return educationChecks;
   }
@@ -111,7 +116,7 @@ public class ReferenceCheckReport implements ReferenceCheckPayload {
     StringBuilder sb = new StringBuilder();
     sb.append("class ReferenceCheckReport {\n");
     
-    sb.append("  referenceCheckId: ").append(referenceCheckId).append("\n");
+    sb.append("  referenceCheck: ").append(referenceCheck).append("\n");
     sb.append("  status: ").append(status).append("\n");
     sb.append("  educationChecks: ").append(educationChecks).append("\n");
     sb.append("  educationStatus: ").append(educationStatus).append("\n");
